@@ -1,1 +1,5 @@
-Tornado==3.0.2
+distribute==0.6.34
+mongoengine==0.8.2
+pymongo==2.5.2
+tornado==3.0.2
+wsgiref==0.1.2
