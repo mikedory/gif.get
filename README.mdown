@@ -36,6 +36,54 @@ Once you've got all that down (and have a mongo connection available), you can r
 And if you're running this on Heroku, that's the same command you'd put in your Procfile as well.
 
 
+#### Querying the API
+
+To get a list of what your available endpoints are, you can hit up the root of the app (assuming you're running it on port 5000):
+
+    # Totally not implemented yet!
+    curl localhost:5000/api/
+
+You can hit up the `/api/gif/` endpoint to get all the gifs
+
+    curl localhost:5000/api/gif/
+
+Which returns something like
+
+    [
+        {
+            "created_at": "2013-07-06 18:34:37.566000",
+            "host_name": "bukk.it",
+            "host_url": "http://bukk.it/",
+            "img_type": "gif",
+            "img_url": "http://bukk.it/zork.gif",
+            "slug": "zork",
+            "tags": [],
+            "title": "zork.gif"
+        },
+        {
+            "created_at": "2013-07-06 18:34:37.564000",
+            "host_name": "bukk.it",
+            "host_url": "http://bukk.it/",
+            "img_type": "gif",
+            "img_url": "http://bukk.it/zoidrage.gif",
+            "slug": "zoidrage",
+            "tags": [],
+            "title": "zoidrage.gif"
+        },
+
+    ...
+
+    ]
+
+Other options include `/api/gif/random/`, to get a single gif at random (filterable by `type`, defaulting to 'gif'):
+
+    curl localhost:5000/api/gif/random/?type=jpg
+
+And for funsies, you can see what gif-hosting sites are currently being tracked:
+
+    curl localhost:5000/api/gifsite/
+
+
 #### Scraping
 
 To scrape the great Ethan Marcotte's [bukk.it](http://bukk.it), for example, you could run the following:
