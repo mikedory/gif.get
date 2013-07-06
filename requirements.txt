@@ -2,5 +2,6 @@ beautifulsoup4==4.2.1
 distribute==0.6.34
 mongoengine==0.8.2
 pymongo==2.5.2
+requests==1.2.3
 tornado==3.0.2
 wsgiref==0.1.2
