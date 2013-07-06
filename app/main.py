@@ -14,7 +14,6 @@ import tornado.web
 from tornado.options import define
 
 # import mongo things
-import bson
 from mongoengine import *
 
 # import our models
@@ -99,7 +98,7 @@ class GifHandler(tornado.web.RequestHandler):
                 "host_name": gif["host_name"],
                 "host_url": gif["host_url"],
                 "tags": gif["tags"],
-                "created_at": gif["created_at"]
+                "created_at": str(gif["created_at"])
             }
 
         # if that search came up empty, return a 404
@@ -112,7 +111,7 @@ class GifHandler(tornado.web.RequestHandler):
 
         # write it out
         self.set_header('Content-Type', 'application/javascript')
-        self.write(json.dumps(response, default=bson.json_util.default))
+        self.write(json.dumps(response))
 
 
 # the main page
@@ -138,7 +137,7 @@ class GifsiteHandler(tornado.web.RequestHandler):
                 "slug": gifsite["slug"],
                 "body": gifsite["body"],
                 "tags": gifsite["tags"],
-                "created_at": gifsite["created_at"]
+                "created_at": str(gifsite["created_at"])
             }
 
         # if that search came up empty, return a 404
@@ -151,7 +150,7 @@ class GifsiteHandler(tornado.web.RequestHandler):
 
         # write it out
         self.set_header('Content-Type', 'application/javascript')
-        self.write(json.dumps(response, default=bson.json_util.default))
+        self.write(json.dumps(response))
 
 
 # RAMMING SPEEEEEEED!
