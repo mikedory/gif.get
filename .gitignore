@@ -9,6 +9,7 @@ lib
 
 # virtualenv stuff
 venv
+gif-venv
 
 # osx stuff
 .DS_Store
