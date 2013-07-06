@@ -111,6 +111,45 @@ class GifHandler(tornado.web.RequestHandler):
         self.write(json.dumps(response))
 
 
+# the main page
+class GifsiteHandler(tornado.web.RequestHandler):
+    def get(self, slug):
+
+        # if there's a gif requested, look it up
+        if slug is not None:
+            try:
+                gifsite = Gifsite.objects.get(slug=slug)
+            except DoesNotExist:
+                gifsite = None
+
+        # if none were requested, return one at random
+        else:
+            gifsites = Gifsite.objects.all()
+            gifsite = random.choice(gifsites)
+
+        # if that produced a result, return it
+        if gifsite is not None:
+            self.set_header('Content-Type', 'application/javascript')
+            response = {
+                # "_id": gifsite["id"],
+                "title": gifsite["title"],
+                "slug": gifsite["slug"],
+                # "created_at": gifsite["created_at"]
+            }
+
+        # if that search came up empty, return a 404
+        else:
+            self.set_status(404)
+            self.set_header('Content-Type', 'application/javascript')
+            response = {
+                "title": "404'd!",
+                "status": "404",
+            }
+
+        # write it out
+        self.write(json.dumps(response))
+
+
 # RAMMING SPEEEEEEED!
 def main():
     tornado.options.parse_command_line()
