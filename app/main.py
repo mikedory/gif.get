@@ -31,7 +31,8 @@ define("mongo_dbname", default="gif-dot-get", help="name of the database", type=
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r"/", IndexHandler),
+#            (r"/", IndexHandler),
+            (r"/?([^/]+)?", GifHandler),
             (r"/gif/?([^/]+)?", GifHandler),
             (r"/gifsite/?([^/]+)?", GifsiteHandler)
         ]
