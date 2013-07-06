@@ -109,7 +109,12 @@ class GifHandler(tornado.web.RequestHandler):
             try:
                 gif = Gif.objects.get(img_type=query_type)(slug=slug)
             except DoesNotExist:
-                gif = None
+                # if that query came up empty, return a 404
+                self.set_status(404)
+                response = {
+                    "title": "404'd!",
+                    "status": "404",
+                }
 
         # if no gif was requested, fetch them all
         else:
@@ -120,14 +125,6 @@ class GifHandler(tornado.web.RequestHandler):
         for gif in gifs:
             single_response = format_gif_for_json_response(gif)
             response.append(single_response)
-
-        # # if that query came up empty, return a 404
-        # else:
-        #     self.set_status(404)
-        #     response = {
-        #         "title": "404'd!",
-        #         "status": "404",
-        #     }
 
         # write it out
         self.set_header('Content-Type', 'application/javascript')
