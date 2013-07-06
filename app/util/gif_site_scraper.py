@@ -21,8 +21,8 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name):
     # grab all the links on the page
     for image in soup.findAll(element):
 
-        # make sure we're only getting gifs
-        if "gif" in image["href"]:
+        # make sure we're only getting gifs, jpgs, and jpegs
+        if any(extension in image["href"] for extension in ['gif', 'jpg', 'jpeg']):
 
             # assemble the url and post body
             img_url = gif_site_url + image["href"]
