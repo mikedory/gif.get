@@ -27,15 +27,29 @@ define("mongo_port", default=27017, help="port mongodb is listening on", type=in
 define("mongo_dbname", default="gif-dot-get", help="name of the database", type=str)
 
 
+def format_gif_for_json_response(gif):
+    single_response = {
+        "title": gif["title"],
+        "slug": gif["slug"],
+        "img_url": gif["img_url"],
+        "img_type": gif["img_type"],
+        "host_name": gif["host_name"],
+        "host_url": gif["host_url"],
+        "tags": gif["tags"],
+        "created_at": str(gif["created_at"])
+    }
+    return single_response
+
+
 # application settings and handle mapping info
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/", IndexHandler),
             (r"/api/?", RootHandler),
-            (r"/api/gif/?([^/]+)?", GifHandler),
-            (r"/api/gif/random/?([^/]+)?", RandomGifHandler),
-            (r"/api/gifsite/?([^/]+)?", GifsiteHandler)
+            (r"/api/gif/([^/]+)?", GifHandler),
+            (r"/api/gif/random/?", RandomGifHandler),
+            (r"/api/gifsite/([^/]+)?", GifsiteHandler)
         ]
         settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -75,26 +89,8 @@ class IndexHandler(tornado.web.RequestHandler):
 class RootHandler(tornado.web.RequestHandler):
     def get(self, q=None):
 
-        # parse the filters off the command line
-        query_type = self.get_argument('type', 'gif')
-        query_limit = self.get_argument('limit', 25)
-
-        # get all the gifs
-        gifs = Gif.objects(img_type=query_type)[:query_limit]
-
         # if that query produced a result, return it
-        response = []
-        for gif in gifs:
-            response = {
-                "title": gif["title"],
-                "slug": gif["slug"],
-                "img_url": gif["img_url"],
-                "img_type": gif["img_type"],
-                "host_name": gif["host_name"],
-                "host_url": gif["host_url"],
-                "tags": gif["tags"],
-                "created_at": str(gif["created_at"])
-            }
+        response = ['endpoints!']
 
         # write it out
         self.set_header('Content-Type', 'application/javascript')
@@ -106,6 +102,7 @@ class GifHandler(tornado.web.RequestHandler):
     def get(self, slug):
 
         query_type = self.get_argument('type', 'gif')
+        query_limit = self.get_argument('limit', 25)
 
         # if there's a gif requested, look it up
         if slug is not None:
@@ -114,34 +111,23 @@ class GifHandler(tornado.web.RequestHandler):
             except DoesNotExist:
                 gif = None
 
-        # if no gif was requested, return one at random
+        # if no gif was requested, fetch them all
         else:
-            # I should probably do this method here instead:
-            # http://stackoverflow.com/questions/2824157/random-record-from-mongodb
-            # but for a tiny set it's fine for now
-            gifs = Gif.objects.all()
-            gif = random.choice(gifs)
+            gifs = Gif.objects(img_type=query_type)[:query_limit]
 
         # if that query produced a result, return it
-        if gif is not None:
-            response = {
-                "title": gif["title"],
-                "slug": gif["slug"],
-                "img_url": gif["img_url"],
-                "img_type": gif["img_type"],
-                "host_name": gif["host_name"],
-                "host_url": gif["host_url"],
-                "tags": gif["tags"],
-                "created_at": str(gif["created_at"])
-            }
+        response = []
+        for gif in gifs:
+            single_response = format_gif_for_json_response(gif)
+            response.append(single_response)
 
-        # if that query came up empty, return a 404
-        else:
-            self.set_status(404)
-            response = {
-                "title": "404'd!",
-                "status": "404",
-            }
+        # # if that query came up empty, return a 404
+        # else:
+        #     self.set_status(404)
+        #     response = {
+        #         "title": "404'd!",
+        #         "status": "404",
+        #     }
 
         # write it out
         self.set_header('Content-Type', 'application/javascript')
@@ -161,16 +147,7 @@ class RandomGifHandler(tornado.web.RequestHandler):
 
         # if that query produced a result, return it
         if gif is not None:
-            response = {
-                "title": gif["title"],
-                "slug": gif["slug"],
-                "img_url": gif["img_url"],
-                "img_type": gif["img_type"],
-                "host_name": gif["host_name"],
-                "host_url": gif["host_url"],
-                "tags": gif["tags"],
-                "created_at": str(gif["created_at"])
-            }
+            response = format_gif_for_json_response(gif)
 
         # if that query came up empty, return a 404
         else:
