@@ -81,7 +81,7 @@ class GifHandler(tornado.web.RequestHandler):
             except DoesNotExist:
                 gif = None
 
-        # if none were requested, return one at random
+        # if no gif was requested, return one at random
         else:
             # I should probably do this method here instead:
             # http://stackoverflow.com/questions/2824157/random-record-from-mongodb
