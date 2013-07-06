@@ -11,6 +11,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+from tornado.options import define
 
 # import mongo things
 import bson
@@ -20,8 +21,7 @@ from mongoengine import *
 from models import Gifsite
 from models import Gif
 
-# import and define tornado-y things
-from tornado.options import define
+# define the app settings
 define("port", default=5000, help="run on the given port", type=int)
 define("mongo_url", default="localhost", help="location of mongodb", type=str)
 define("mongo_port", default=27017, help="port mongodb is listening on", type=int)

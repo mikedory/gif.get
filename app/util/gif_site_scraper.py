@@ -1,10 +1,11 @@
 import os
+
+import tornado
+from tornado.options import define
 import requests
 from bs4 import BeautifulSoup
 
 # parse the command-line options
-import tornado
-from tornado.options import define
 define("gif_site_url", help="the url of the site to scrape", type=str)
 define("gif_site_name", help="the name of the site being scraped", type=str)
 define("element", default="a", help="the type of tag to search for", type=str)
