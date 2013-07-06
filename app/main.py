@@ -103,6 +103,7 @@ class GifHandler(tornado.web.RequestHandler):
 
         query_type = self.get_argument('type', 'gif')
         query_limit = self.get_argument('limit', 25)
+        query_order_by = self.get_argument('sort', '-created_at')
 
         # if there's a gif requested, look it up
         if slug is not None:
@@ -124,7 +125,7 @@ class GifHandler(tornado.web.RequestHandler):
         # if no gif was requested, fetch them all
         else:
             # get every entry matching the optional type and limit filters
-            gifs = Gif.objects(img_type=query_type)[:query_limit]
+            gifs = Gif.objects(img_type=query_type).order_by(query_order_by)[:int(query_limit)]
 
             # if that query produced a result, return it
             response = []
