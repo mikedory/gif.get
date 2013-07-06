@@ -17,18 +17,19 @@ A handy API for fetching and serving gifs.
 
 ### Usage
 
-The following all assumes you've got an environment up and running with Python 2.7+, access to the interwebs, and a MongoDB connection somewhere.
+The following all assumes you've got an environment up and running with Python 2.6+, access to the interwebs, and a MongoDB connection somewhere.
 
 To run the app, you'll probably want to set up a virtualenv first
 
     pip install virtualenv
-    virtualenv gif-venv --distribute && source ./gif-venv/bin/activate
+    virtualenv gif-venv --distribute
+    source ./gif-venv/bin/activate
 
 Then install the dependencies
 
     pip install -r requirements.txt
 
-Once you've got all that down (and have a mongo connection availble), you can run the web app thusly:
+Once you've got all that down (and have a mongo connection available), you can run the web app thusly:
 
     python app/main.py
 
