@@ -107,7 +107,8 @@ class GifHandler(tornado.web.RequestHandler):
         # if there's a gif requested, look it up
         if slug is not None:
             try:
-                gif = Gif.objects.get(img_type=query_type)(slug=slug)
+                gif = Gif.objects.get(img_type=query_type, slug=slug)
+                response = format_gif_for_json_response(gif)
             except DoesNotExist:
                 # if that query came up empty, return a 404
                 self.set_status(404)
@@ -118,13 +119,14 @@ class GifHandler(tornado.web.RequestHandler):
 
         # if no gif was requested, fetch them all
         else:
+            # get every entry matching the optional type and limit filters
             gifs = Gif.objects(img_type=query_type)[:query_limit]
 
-        # if that query produced a result, return it
-        response = []
-        for gif in gifs:
-            single_response = format_gif_for_json_response(gif)
-            response.append(single_response)
+            # if that query produced a result, return it
+            response = []
+            for gif in gifs:
+                single_response = format_gif_for_json_response(gif)
+                response.append(single_response)
 
         # write it out
         self.set_header('Content-Type', 'application/javascript')
