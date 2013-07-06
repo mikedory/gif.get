@@ -31,10 +31,11 @@ define("mongo_dbname", default="gif-dot-get", help="name of the database", type=
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            # (r"/", IndexHandler),
-            (r"/?([^/]+)?", GifHandler),
-            (r"/gif/?([^/]+)?", GifHandler),
-            (r"/gifsite/?([^/]+)?", GifsiteHandler)
+            (r"/", IndexHandler),
+            (r"/api/?", RootHandler),
+            (r"/api/gif/?([^/]+)?", GifHandler),
+            (r"/api/gif/random/?([^/]+)?", RandomGifHandler),
+            (r"/api/gifsite/?([^/]+)?", GifsiteHandler)
         ]
         settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -70,14 +71,46 @@ class IndexHandler(tornado.web.RequestHandler):
         )
 
 
-# the main page
+# the base api endpoint
+class RootHandler(tornado.web.RequestHandler):
+    def get(self, q=None):
+
+        # parse the filters off the command line
+        query_type = self.get_argument('type', 'gif')
+        query_limit = self.get_argument('limit', 25)
+
+        # get all the gifs
+        gifs = Gif.objects(img_type=query_type)[:query_limit]
+
+        # if that query produced a result, return it
+        response = []
+        for gif in gifs:
+            response = {
+                "title": gif["title"],
+                "slug": gif["slug"],
+                "img_url": gif["img_url"],
+                "img_type": gif["img_type"],
+                "host_name": gif["host_name"],
+                "host_url": gif["host_url"],
+                "tags": gif["tags"],
+                "created_at": str(gif["created_at"])
+            }
+
+        # write it out
+        self.set_header('Content-Type', 'application/javascript')
+        self.write(json.dumps(response))
+
+
+# the base gif endpoint
 class GifHandler(tornado.web.RequestHandler):
     def get(self, slug):
+
+        query_type = self.get_argument('type', 'gif')
 
         # if there's a gif requested, look it up
         if slug is not None:
             try:
-                gif = Gif.objects.get(slug=slug)
+                gif = Gif.objects.get(img_type=query_type)(slug=slug)
             except DoesNotExist:
                 gif = None
 
@@ -89,7 +122,7 @@ class GifHandler(tornado.web.RequestHandler):
             gifs = Gif.objects.all()
             gif = random.choice(gifs)
 
-        # if that produced a result, return it
+        # if that query produced a result, return it
         if gif is not None:
             response = {
                 "title": gif["title"],
@@ -102,7 +135,7 @@ class GifHandler(tornado.web.RequestHandler):
                 "created_at": str(gif["created_at"])
             }
 
-        # if that search came up empty, return a 404
+        # if that query came up empty, return a 404
         else:
             self.set_status(404)
             response = {
@@ -115,7 +148,44 @@ class GifHandler(tornado.web.RequestHandler):
         self.write(json.dumps(response))
 
 
-# the main page
+# the main endpoint
+class RandomGifHandler(tornado.web.RequestHandler):
+    def get(self, q=None):
+
+        # parse the filters off the command line
+        query_type = self.get_argument('type', 'gif')
+
+        # return a gif at random
+        gifs = Gif.objects(img_type=query_type)
+        gif = random.choice(gifs)
+
+        # if that query produced a result, return it
+        if gif is not None:
+            response = {
+                "title": gif["title"],
+                "slug": gif["slug"],
+                "img_url": gif["img_url"],
+                "img_type": gif["img_type"],
+                "host_name": gif["host_name"],
+                "host_url": gif["host_url"],
+                "tags": gif["tags"],
+                "created_at": str(gif["created_at"])
+            }
+
+        # if that query came up empty, return a 404
+        else:
+            self.set_status(404)
+            response = {
+                "title": "404'd!",
+                "status": "404",
+            }
+
+        # write it out
+        self.set_header('Content-Type', 'application/javascript')
+        self.write(json.dumps(response))
+
+
+# the base gifsite endpoint
 class GifsiteHandler(tornado.web.RequestHandler):
     def get(self, slug):
 
