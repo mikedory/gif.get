@@ -108,9 +108,13 @@ class GifHandler(tornado.web.RequestHandler):
         if slug is not None:
             try:
                 gif = Gif.objects.get(img_type=query_type, slug=slug)
-                response = format_gif_for_json_response(gif)
             except DoesNotExist:
                 # if that query came up empty, return a 404
+                gif = None
+
+            if gif is not None:
+                response = format_gif_for_json_response(gif)
+            else:
                 self.set_status(404)
                 response = {
                     "title": "404'd!",
