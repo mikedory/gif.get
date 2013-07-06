@@ -13,6 +13,7 @@ import tornado.options
 import tornado.web
 
 # import mongo things
+import bson
 from mongoengine import *
 
 # import our models
@@ -31,9 +32,9 @@ define("mongo_dbname", default="gif-dot-get", help="name of the database", type=
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r"/([^/]+)?", IndexHandler),
-            (r"/gif/([^/]+)?", GifHandler),
-            (r"/gifsite/([^/]+)?", GifsiteHandler)
+            (r"/", IndexHandler),
+            (r"/gif/?([^/]+)?", GifHandler),
+            (r"/gifsite/?([^/]+)?", GifsiteHandler)
         ]
         settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -90,25 +91,28 @@ class GifHandler(tornado.web.RequestHandler):
 
         # if that produced a result, return it
         if gif is not None:
-            self.set_header('Content-Type', 'application/javascript')
             response = {
-                # "_id": gif["id"],
                 "title": gif["title"],
                 "slug": gif["slug"],
-                # "created_at": gif["created_at"]
+                "img_url": gif["img_url"],
+                "img_type": gif["img_type"],
+                "host_name": gif["host_name"],
+                "host_url": gif["host_url"],
+                "tags": gif["tags"],
+                "created_at": gif["created_at"]
             }
 
         # if that search came up empty, return a 404
         else:
             self.set_status(404)
-            self.set_header('Content-Type', 'application/javascript')
             response = {
                 "title": "404'd!",
                 "status": "404",
             }
 
         # write it out
-        self.write(json.dumps(response))
+        self.set_header('Content-Type', 'application/javascript')
+        self.write(json.dumps(response, default=bson.json_util.default))
 
 
 # the main page
@@ -129,25 +133,25 @@ class GifsiteHandler(tornado.web.RequestHandler):
 
         # if that produced a result, return it
         if gifsite is not None:
-            self.set_header('Content-Type', 'application/javascript')
             response = {
-                # "_id": gifsite["id"],
                 "title": gifsite["title"],
                 "slug": gifsite["slug"],
-                # "created_at": gifsite["created_at"]
+                "body": gifsite["body"],
+                "tags": gifsite["tags"],
+                "created_at": gifsite["created_at"]
             }
 
         # if that search came up empty, return a 404
         else:
             self.set_status(404)
-            self.set_header('Content-Type', 'application/javascript')
             response = {
                 "title": "404'd!",
                 "status": "404",
             }
 
         # write it out
-        self.write(json.dumps(response))
+        self.set_header('Content-Type', 'application/javascript')
+        self.write(json.dumps(response, default=bson.json_util.default))
 
 
 # RAMMING SPEEEEEEED!
