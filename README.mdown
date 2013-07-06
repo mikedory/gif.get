@@ -1,7 +1,39 @@
-## Gif.get
+Gif.get
+-------
 
 A handy API for fetching gifs.
 
-## About
+### Requirements
+
+- Python 2.6+
+    - Tornado 3+
+    - Beautiful Soup 4+
+    - MongoEngine
+    - PyMongo
+    - Requests
+- Mongo DB
+
+### Usage
+
+The following all assumes you've got an environment up and running with Python 2.7+, 
+
+To run the app, you'll probably want to set up a virtualenv first
+
+    pip install virtualenv
+    virtualenv gif-venv --distribute && source ./gif-venv/bin/activate
+
+Then install the dependancies
+
+    pip install -r requirements.txt
+
+Assuming you've 
+
+#### Scraping
+
+To scrape the great Ethan Marcotte's [bukk.it](http://bukk.it), for example, you could run the following:
+
+    python util/gif_site_scraper.py --gif_site_url='http://bukk.it/' --gif_site_name='bukk.it'
+
+### About
 
 This app was assembled by [Mike Dory](https://github.com/mikedory).
