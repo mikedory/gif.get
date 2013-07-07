@@ -22,7 +22,9 @@ from app.models import Gif
 define("gif_site_url", help="the url of the site to scrape", type=str)
 define("gif_site_name", help="the name of the site being scraped", type=str)
 define("element", default="img", help="the type of tag to search for", type=str)
-define("tags", default=None, help="tags to apply to everything scraped", type=str)
+define("gif_tags", default=None, help="tags to apply to everything scraped", type=str)
+define("gifsite_tags", default=None, help="tags to apply to everything scraped", type=str)
+define("gifsite_description", default=None, help="tags to apply to everything scraped", type=str)
 define("mongo_url", default="localhost", help="location of mongodb", type=str)
 define("mongo_port", default=27017, help="port mongodb is listening on", type=int)
 define("mongo_dbname", default="gif-dot-get", help="name of the database", type=str)
@@ -39,15 +41,15 @@ def get_db_connection():
 
 
 # the soup of gifs
-def get_gifs_by_element(element, gif_site_url, gif_site_name, tags):
+def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags):
 
     # get all the gifs
     r = requests.get(gif_site_url)
     soup = BeautifulSoup(r.text)
 
     # split the tags, if there are any
-    if tags is not None:
-        tags = tags.split(',')
+    if gif_tags is not None:
+        gif_tags = gif_tags.split(',')
 
     # grab all the links on the page
     for image in soup.findAll(element):
@@ -84,7 +86,7 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, tags):
                 img_type = (os.path.splitext(title)[1]).split('.')[-1]
                 host_name = gif_site_name
                 host_url = gif_site_url
-                tags = tags
+                tags = gif_tags
 
                 # debugginate
                 print '---'
@@ -105,7 +107,7 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, tags):
 
 
 # write in all the newfound gifs
-def update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, tags):
+def update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, gif_tags=None):
 
     # fetch the gif if it already exists, create it if it doesn't
     gif, created = Gif.objects.get_or_create(
@@ -115,11 +117,26 @@ def update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, tags
         img_type=img_type,
         host_name=host_name,
         host_url=host_url,
-        tags=tags
+        tags=gif_tags
     )
 
     # return the gif and the true/false of its creation
     return gif, created
+
+
+# add the gifsite to the database
+def update_gifsite_by_slug(title, slug, gifsite_description=None, gifsite_tags=None):
+
+    # fetch the gifsite if it already exists, create it if it doesn't
+    gif, created = Gif.objects.get_or_create(
+        slug=slug,
+        title=title,
+        description=gifsite_description,
+        tags=gifsite_tags
+    )
+
+    # return the gif and the true/false of its creation
+    return gifsite, created
 
 
 # slice the url up into pieces
