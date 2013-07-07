@@ -17,14 +17,15 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 
 # import our models
 from app.models import Gif
+from app.models import Gifsite
 
 # parse the command-line options
 define("gif_site_url", help="the url of the site to scrape", type=str)
 define("gif_site_name", help="the name of the site being scraped", type=str)
 define("element", default="img", help="the type of tag to search for", type=str)
 define("gif_tags", default=None, help="tags to apply to everything scraped", type=str)
-define("gifsite_tags", default=None, help="tags to apply to everything scraped", type=str)
-define("gifsite_description", default=None, help="tags to apply to everything scraped", type=str)
+define("gif_site_tags", default=None, help="tags to apply to everything scraped", type=str)
+define("gif_site_description", default=None, help="tags to apply to everything scraped", type=str)
 define("mongo_url", default="localhost", help="location of mongodb", type=str)
 define("mongo_port", default=27017, help="port mongodb is listening on", type=int)
 define("mongo_dbname", default="gif-dot-get", help="name of the database", type=str)
@@ -41,7 +42,7 @@ def get_db_connection():
 
 
 # the soup of gifs
-def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags):
+def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site_tags, gif_site_description):
 
     # get all the gifs
     r = requests.get(gif_site_url)
@@ -100,14 +101,19 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags):
                 print 'tags: %s' % tags
 
                 # in which gifs are found or created
-                upsert = update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, tags)
+                gif_upsert = update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, tags)
 
-                print upsert
+                print gif_upsert
+
+                host_name_slug = host_name.strip('cmowz.')
+                gif_site_upsert = update_gif_site_by_slug(host_name, host_name_slug, gif_site_description, gif_site_tags)
+
+                print gif_site_upsert
                 print '---\n'
 
 
 # write in all the newfound gifs
-def update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, gif_tags=None):
+def update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, gif_tags):
 
     # fetch the gif if it already exists, create it if it doesn't
     gif, created = Gif.objects.get_or_create(
@@ -125,18 +131,18 @@ def update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, gif_
 
 
 # add the gifsite to the database
-def update_gifsite_by_slug(title, slug, gifsite_description=None, gifsite_tags=None):
+def update_gif_site_by_slug(title, slug, gif_site_description, gif_site_tags):
 
     # fetch the gifsite if it already exists, create it if it doesn't
-    gif, created = Gif.objects.get_or_create(
+    gif_site, created = Gifsite.objects.get_or_create(
         slug=slug,
         title=title,
-        description=gifsite_description,
-        tags=gifsite_tags
+        description=gif_site_description,
+        tags=gif_site_tags
     )
 
     # return the gif and the true/false of its creation
-    return gifsite, created
+    return gif_site, created
 
 
 # slice the url up into pieces
@@ -165,5 +171,7 @@ if __name__ == "__main__":
         tornado.options.options.element,
         tornado.options.options.gif_site_url,
         tornado.options.options.gif_site_name,
-        tornado.options.options.tags
+        tornado.options.options.gif_tags,
+        tornado.options.options.gif_site_tags,
+        tornado.options.options.gif_site_description
     )
