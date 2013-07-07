@@ -101,13 +101,13 @@ That will redirect you to the image returned, as will a single-gif query:
 
 #### Scraping
 
-To scrape the great Ethan Marcotte's [bukk.it](http://bukk.it), for example, you could run the following:
+To import images into the database, you can use the included `gif_site_scraper.py` script.  It's easy!  All you have to sepecify is the url of the site, and the name you want it to be called:
 
-    python util/gif_site_scraper.py --gif_site_url='http://bukk.it/' --gif_site_name='bukk.it'
+    python util/gif_site_scraper.py --gif_site_url='https://github.com/blog/1465-stl-file-viewing' --gif_site_name='github'
 
-The script assumes you're looking for `"a"` tags, but you can specify `"img"` tags by passing that as a flag:
+The script assumes you're looking for `"img"` tags, but you can specify `"a"` tags by passing that as a flag.  For example, you could scrape the great Ethan Marcotte's brilliant [bukk.it](http://bukk.it) by running the following:
 
-    --element='img'
+    python util/gif_site_scraper.py --gif_site_url='http://bukk.it/' --gif_site_name='bukk.it' --element='a'
 
 You can specify tags as you import things as well!
 
