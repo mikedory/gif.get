@@ -105,6 +105,16 @@ To scrape the great Ethan Marcotte's [bukk.it](http://bukk.it), for example, you
 
     python util/gif_site_scraper.py --gif_site_url='http://bukk.it/' --gif_site_name='bukk.it'
 
+The script assumes you're looking for `"a"` tags, but you can specify `"img"` tags by passing that as a flag:
+
+    --element='img'
+
+You can specify tags as you import things as well!
+
+    python util/gif_site_scraper.py --gif_site_url='http://thecreativewritersproblems.tumblr.com/post/54462832991/when-i-accidentally-reblog-to-this-blog-instead-of-my' --gif_site_name='tumblr' --tags=community,tv,television --element='img'
+
+That way you can batch-import with a tag for each image as it comes in.
+
 
 ### About
 
