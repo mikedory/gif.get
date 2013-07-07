@@ -70,8 +70,6 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, tags):
 
             if not check_tracking_pixel(target_url):
 
-                print "target_image_url: %s" % target_image_url
-                print "target_url: %s" % target_url
                 # define the document structure
                 title = target_url_segments.path.split('/')[-1]
                 slug = os.path.splitext(title)[0]
