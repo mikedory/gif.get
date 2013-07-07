@@ -28,7 +28,10 @@ define("mongo_port", default=27017, help="port mongodb is listening on", type=in
 define("mongo_dbname", default="gif-dot-get", help="name of the database", type=str)
 
 
+# connect to mongo
 def get_db_connection():
+
+    # connect using mongoengine
     db = connect(
         tornado.options.options.mongo_dbname,
         host=tornado.options.options.mongo_url,
@@ -45,7 +48,8 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, tags):
     r = requests.get(gif_site_url)
     soup = BeautifulSoup(r.text)
 
-    tags = tags.split(',')
+    if tags is not None:
+        tags = tags.split(',')
 
     # grab all the links on the page
     for image in soup.findAll(element):
