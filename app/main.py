@@ -41,6 +41,14 @@ def format_gif_for_json_response(gif):
     return single_response
 
 
+def format_404_for_json_response():
+    single_response = {
+        "title": "404'd!",
+        "status": "404",
+    }
+    return single_response
+
+
 # application settings and handle mapping info
 class Application(tornado.web.Application):
     def __init__(self):
@@ -119,10 +127,7 @@ class GifHandler(tornado.web.RequestHandler):
             except DoesNotExist:
                 # if that query came up empty, return a 404
                 self.set_status(404)
-                response = {
-                    "title": "404'd!",
-                    "status": "404",
-                }
+                response = format_404_for_json_response()
 
         # if no gif was requested, fetch them all
         else:
@@ -159,10 +164,7 @@ class RandomGifHandler(tornado.web.RequestHandler):
         # if that query came up empty, return a 404
         else:
             self.set_status(404)
-            response = {
-                "title": "404'd!",
-                "status": "404",
-            }
+            response = format_404_for_json_response()
 
         # if a redirect was requested, nicely do so
         if any(value in query_redirect for value in ['True', 'true']):
@@ -202,10 +204,7 @@ class GifsiteHandler(tornado.web.RequestHandler):
         # if that search came up empty, return a 404
         else:
             self.set_status(404)
-            response = {
-                "title": "404'd!",
-                "status": "404",
-            }
+            response = format_404_for_json_response()
 
         # write it out
         self.set_header('Content-Type', 'application/javascript')
