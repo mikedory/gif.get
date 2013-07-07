@@ -54,7 +54,7 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, tags):
         elif "img" in element:
             target_image = image["src"]
         else:
-            print 'bananamonkeys'
+            sys.exit('Only "a" and "img" elements are supported.')
 
         # make sure we're only getting gifs, jpgs, and jpegs
         if any(extension in target_image for extension in ['gif', 'jpg', 'jpeg']):
@@ -108,6 +108,9 @@ def update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, tags
 
 # check to see if there's a tld in this file name
 def check_tld_list(file_to_check):
+
+    # define every known tld
+    # (as per http://en.wikipedia.org/wiki/List_of_Internet_top-level_domains)
     tld_names = [
         ".aero",
         ".asia",
