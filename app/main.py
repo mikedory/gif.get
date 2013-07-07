@@ -26,29 +26,6 @@ define("mongo_url", default="localhost", help="location of mongodb", type=str)
 define("mongo_port", default=27017, help="port mongodb is listening on", type=int)
 define("mongo_dbname", default="gif-dot-get", help="name of the database", type=str)
 
-
-def format_gif_for_json_response(gif):
-    single_response = {
-        "title": gif["title"],
-        "slug": gif["slug"],
-        "img_url": gif["img_url"],
-        "img_type": gif["img_type"],
-        "host_name": gif["host_name"],
-        "host_url": gif["host_url"],
-        "tags": gif["tags"],
-        "created_at": str(gif["created_at"])
-    }
-    return single_response
-
-
-def format_404_for_json_response():
-    single_response = {
-        "title": "404'd!",
-        "status": "404",
-    }
-    return single_response
-
-
 # application settings and handle mapping info
 class Application(tornado.web.Application):
     def __init__(self):
@@ -74,6 +51,42 @@ class Application(tornado.web.Application):
 
         # define the application
         tornado.web.Application.__init__(self, handlers, **settings)
+
+
+# format gifs for json output
+def format_gif_for_json_response(gif):
+    single_response = {
+        "title": gif["title"],
+        "slug": gif["slug"],
+        "img_url": gif["img_url"],
+        "img_type": gif["img_type"],
+        "host_name": gif["host_name"],
+        "host_url": gif["host_url"],
+        "tags": gif["tags"],
+        "created_at": str(gif["created_at"])
+    }
+    return single_response
+
+
+# format gifsites for json output
+def format_gifsite_for_json_response(gifsite):
+    single_response = {
+        "title": gifsite["title"],
+        "slug": gifsite["slug"],
+        "body": gifsite["body"],
+        "tags": gifsite["tags"],
+        "created_at": str(gifsite["created_at"])
+    }
+    return single_response
+
+
+# format 404s for json output
+def format_404_for_json_response():
+    single_response = {
+        "title": "404'd!",
+        "status": "404",
+    }
+    return single_response
 
 
 # the main page
@@ -193,13 +206,7 @@ class GifsiteHandler(tornado.web.RequestHandler):
 
         # if that produced a result, return it
         if gifsite is not None:
-            response = {
-                "title": gifsite["title"],
-                "slug": gifsite["slug"],
-                "body": gifsite["body"],
-                "tags": gifsite["tags"],
-                "created_at": str(gifsite["created_at"])
-            }
+            response = format_gifsite_for_json_response(gifsite)
 
         # if that search came up empty, return a 404
         else:
