@@ -26,6 +26,7 @@ define("mongo_url", default="localhost", help="location of mongodb", type=str)
 define("mongo_port", default=27017, help="port mongodb is listening on", type=int)
 define("mongo_dbname", default="gif-dot-get", help="name of the database", type=str)
 
+
 # application settings and handle mapping info
 class Application(tornado.web.Application):
     def __init__(self):
