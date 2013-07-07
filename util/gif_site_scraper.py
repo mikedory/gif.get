@@ -68,7 +68,8 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, tags):
         # make sure we're only getting gifs, jpgs, and jpegs
         if any(extension in target_url for extension in ['gif', 'jpg', 'jpeg']):
 
-            if not check_tracking_pixel(target_url):
+            # make sure it's not a tracking pixel
+            if not check_tracking_pixel(target_image_url):
 
                 # define the document structure
                 title = target_url_segments.path.split('/')[-1]
