@@ -51,6 +51,8 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
     # split the tags, if there are any
     if gif_tags is not None:
         gif_tags = gif_tags.split(',')
+    if gif_site_tags is not None:
+        gif_site_tags = gif_tags.split(',')
 
     # grab all the links on the page
     for image in soup.findAll(element):
@@ -87,7 +89,7 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
                 img_type = (os.path.splitext(title)[1]).split('.')[-1]
                 host_name = gif_site_name
                 host_url = gif_site_url
-                tags = gif_tags
+                gif_tags = gif_tags
 
                 # debugginate
                 print '---'
@@ -98,10 +100,11 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
                 print 'img_type: %s' % img_type
                 print 'host_name: %s' % host_name
                 print 'host_url: %s' % host_url
-                print 'tags: %s' % tags
+                print 'gif_tags: %s' % gif_tags
+                print 'gif_site_tags: %s' % gif_site_tags
 
                 # in which gifs are found or created
-                gif_upsert = update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, tags)
+                gif_upsert = update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, gif_tags)
 
                 print gif_upsert
 
