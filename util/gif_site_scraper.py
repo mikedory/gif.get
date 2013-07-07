@@ -45,6 +45,7 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, tags):
     r = requests.get(gif_site_url)
     soup = BeautifulSoup(r.text)
 
+    # split the tags, if there are any
     if tags is not None:
         tags = tags.split(',')
 
