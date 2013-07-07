@@ -62,16 +62,20 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, tags):
         target_url_segments = url_split(target_url)
         if target_url_segments.netloc:
             # it is an absolute url
-            target_image_url = target_url_segments.netloc
+            target_image_base_url = target_url_segments.netloc
+            target_image_url = target_url
         else:
             # it is a relative url
-            target_image_url = gif_site_url
+            target_image_base_url = gif_site_url
+            if 'http' not in gif_site_name:
+                gif_site_name = 'http://' + gif_site_name
+            target_image_url = gif_site_name + '/' + target_url
 
         # make sure we're only getting gifs, jpgs, and jpegs
         if any(extension in target_url for extension in ['gif', 'jpg', 'jpeg']):
 
             # make sure it's not a tracking pixel
-            if not check_tracking_pixel(target_image_url):
+            if not check_tracking_pixel(target_image_base_url):
 
                 # define the document structure
                 title = target_url_segments.path.split('/')[-1]
