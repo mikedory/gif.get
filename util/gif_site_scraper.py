@@ -83,7 +83,7 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, tags):
 
                 # debugginate
                 print '---'
-                print 'for tag %s of type "%s": ' % (image, element)
+                print 'for tag %s of type "%s": ' % (target_url, element)
                 print 'title: %s' % title
                 print 'slug: %s' % slug
                 print 'img_url: %s' % img_url
