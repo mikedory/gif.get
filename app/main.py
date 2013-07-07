@@ -102,20 +102,22 @@ class GifHandler(tornado.web.RequestHandler):
     def get(self, slug):
 
         query_type = self.get_argument('type', 'gif')
-        query_limit = self.get_argument('limit', 25)
+        query_limit = self.get_argument('limit', '25')
+        query_redirect = self.get_argument('redirect', 'False')
         query_order_by = self.get_argument('sort', '-created_at')
 
         # if there's a gif requested, look it up
         if slug is not None:
             try:
                 gif = Gif.objects.get(img_type=query_type, slug=slug)
+                response = format_gif_for_json_response(gif)
+
+                # if a redirect was requested, nicely do so
+                if any(value in query_redirect for value in ['True', 'true']):
+                    self.redirect(response["img_url"])
+
             except DoesNotExist:
                 # if that query came up empty, return a 404
-                gif = None
-
-            if gif is not None:
-                response = format_gif_for_json_response(gif)
-            else:
                 self.set_status(404)
                 response = {
                     "title": "404'd!",
@@ -144,6 +146,7 @@ class RandomGifHandler(tornado.web.RequestHandler):
 
         # parse the filters off the command line
         query_type = self.get_argument('type', 'gif')
+        query_redirect = self.get_argument('redirect', 'False')
 
         # return a gif at random
         gifs = Gif.objects(img_type=query_type)
@@ -161,9 +164,13 @@ class RandomGifHandler(tornado.web.RequestHandler):
                 "status": "404",
             }
 
-        # write it out
-        self.set_header('Content-Type', 'application/javascript')
-        self.write(json.dumps(response))
+        # if a redirect was requested, nicely do so
+        if any(value in query_redirect for value in ['True', 'true']):
+            self.redirect(response["img_url"])
+        else:
+            # write it out
+            self.set_header('Content-Type', 'application/javascript')
+            self.write(json.dumps(response))
 
 
 # the base gifsite endpoint
