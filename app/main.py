@@ -22,6 +22,7 @@ from models import Gif
 
 # define the app settings
 define("port", default=5000, help="run on the given port", type=int)
+define("base_url", default="http://gif.dory.me", help="name of the database", type=str)
 define("mongo_url", default="localhost", help="location of mongodb", type=str)
 define("mongo_port", default=27017, help="port mongodb is listening on", type=int)
 define("mongo_dbname", default="gif-dot-get", help="name of the database", type=str)
@@ -112,7 +113,10 @@ class RootHandler(tornado.web.RequestHandler):
     def get(self, q=None):
 
         # if that query produced a result, return it
-        response = ['endpoints!']
+        response = {
+            "api_base": tornado.options.options.base_url,
+
+        }
 
         # write it out
         self.set_header('Content-Type', 'application/javascript')
@@ -149,10 +153,11 @@ class GifHandler(tornado.web.RequestHandler):
             gifs = Gif.objects(img_type=query_type).order_by(query_order_by)[:int(query_limit)]
 
             # if that query produced a result, return it
-            response = []
+            response_list = []
             for gif in gifs:
                 single_response = format_gif_for_json_response(gif)
-                response.append(single_response)
+                response_list.append(single_response)
+            response = dict(gifs=response_list)
 
         # write it out
         self.set_header('Content-Type', 'application/javascript')
