@@ -49,10 +49,8 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
     soup = BeautifulSoup(r.text)
 
     # split the tags, if there are any
-    if gif_tags is not None:
-        gif_tags = gif_tags.split(',')
-    if gif_site_tags is not None:
-        gif_site_tags = gif_tags.split(',')
+    gif_tags = tags_split(gif_tags)
+    gif_site_tags = tags_split(gif_site_tags)
 
     # grab all the links on the page
     for image in soup.findAll(element):
@@ -152,6 +150,17 @@ def update_gif_site_by_slug(title, slug, gif_site_description, gif_site_tags):
 def url_split(url):
     segments = urlparse.urlsplit(url)
     return segments
+
+
+# split the tags (or return an empty list)
+def tags_split(tags_string):
+    print tags_string
+    if tags_string is not None:
+        tags_list = tags_string.split(',')
+    else:
+        tags_list = []
+
+    return tags_list
 
 
 # get rid of tracking pixels
