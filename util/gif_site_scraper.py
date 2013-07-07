@@ -2,6 +2,7 @@
 import sys
 import os
 import os.path
+import urlparse
 
 # import our add-ons
 import tornado
@@ -50,42 +51,52 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, tags):
     for image in soup.findAll(element):
 
         if "a" in element:
-            target_image = image["href"]
+            target_url = image["href"]
         elif "img" in element:
-            target_image = image["src"]
+            target_url = image["src"]
         else:
             sys.exit('Only "a" and "img" elements are supported.')
 
+        target_url_segments = url_split(target_url)
+        if target_url_segments.netloc:
+            # it is an absolute url
+            target_image_url = target_url_segments.netloc
+        else:
+            # it is a relative url
+            target_image_url = gif_site_url
+
         # make sure we're only getting gifs, jpgs, and jpegs
-        if any(extension in target_image for extension in ['gif', 'jpg', 'jpeg']):
+        if any(extension in target_url for extension in ['gif', 'jpg', 'jpeg']):
 
-            # assemble the url and post body
-            img_url = gif_site_url + target_image
+            if not check_tracking_pixel(target_url):
 
-            # define the document structure
-            title = target_image
-            slug = os.path.splitext(target_image)[0]
-            img_url = gif_site_url + target_image
-            img_type = os.path.splitext(target_image)[1].split('.')[1]
-            host_name = gif_site_name
-            host_url = gif_site_url
-            tags = tags
+                print "target_image_url: %s" % target_image_url
+                print "target_url: %s" % target_url
+                # define the document structure
+                title = target_url_segments.path.split('/')[-1]
+                slug = os.path.splitext(title)[0]
+                img_url = target_image_url
+                img_type = (os.path.splitext(title)[1]).split('.')[-1]
+                host_name = gif_site_name
+                host_url = gif_site_url
+                tags = tags
 
-            # debugginate
-            print 'for tag %s of type "%s": ' % (image, element)
-            print 'title: %s' % title
-            print 'slug: %s' % slug
-            print 'img_url: %s' % img_url
-            print 'img_type: %s' % img_type
-            print 'host_name: %s' % host_name
-            print 'host_url: %s' % host_url
-            print 'tags: %s' % tags
-            print '---'
+                # debugginate
+                print '---'
+                print 'for tag %s of type "%s": ' % (image, element)
+                print 'title: %s' % title
+                print 'slug: %s' % slug
+                print 'img_url: %s' % img_url
+                print 'img_type: %s' % img_type
+                print 'host_name: %s' % host_name
+                print 'host_url: %s' % host_url
+                print 'tags: %s' % tags
 
-            # in which gifs are found or created
-            upsert = update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, tags)
+                # in which gifs are found or created
+                upsert = update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, tags)
 
-            print upsert
+                print upsert
+                print '---\n'
 
 
 # write in all the newfound gifs
@@ -106,298 +117,23 @@ def update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, tags
     return gif, created
 
 
-# check to see if there's a tld in this file name
-def check_tld_list(file_to_check):
+# slice the url up into pieces
+def url_split(url):
+    segments = urlparse.urlsplit(url)
+    return segments
 
-    # define every known tld
-    # (as per http://en.wikipedia.org/wiki/List_of_Internet_top-level_domains)
-    tld_names = [
-        ".aero",
-        ".asia",
-        ".biz",
-        ".cat",
-        ".com",
-        ".coop",
-        ".info",
-        ".int",
-        ".jobs",
-        ".mobi",
-        ".museum",
-        ".name",
-        ".net",
-        ".org",
-        ".post",
-        ".pro",
-        ".tel",
-        ".travel",
-        ".xxx",
-        ".edu",
-        ".gov",
-        ".mil",
-        ".ac",
-        ".ad",
-        ".ae",
-        ".af",
-        ".ag",
-        ".ai",
-        ".al",
-        ".am",
-        ".an",
-        ".ao",
-        ".aq",
-        ".ar",
-        ".as",
-        ".at",
-        ".au",
-        ".aw",
-        ".ax",
-        ".az",
-        ".ba",
-        ".bb",
-        ".bd",
-        ".be",
-        ".bf",
-        ".bg",
-        ".bh",
-        ".bi",
-        ".bj",
-        ".bm",
-        ".bn",
-        ".bo",
-        ".br",
-        ".bs",
-        ".bt",
-        ".bv",
-        ".bw",
-        ".by",
-        ".bz",
-        ".ca",
-        ".cc",
-        ".cd",
-        ".cf",
-        ".cg",
-        ".ch",
-        ".ci",
-        ".ck",
-        ".cl",
-        ".cm",
-        ".cn",
-        ".co",
-        ".cr",
-        ".cs",
-        ".cu",
-        ".cv",
-        ".cx",
-        ".cy",
-        ".cz",
-        ".dd",
-        ".de",
-        ".dj",
-        ".dk",
-        ".dm",
-        ".do",
-        ".dz",
-        ".ec",
-        ".ee",
-        ".eg",
-        ".eh",
-        ".er",
-        ".es",
-        ".et",
-        ".eu",
-        ".fi",
-        ".fj",
-        ".fk",
-        ".fm",
-        ".fo",
-        ".fr",
-        ".ga",
-        ".gb",
-        ".gd",
-        ".ge",
-        ".gf",
-        ".gg",
-        ".gh",
-        ".gi",
-        ".gl",
-        ".gm",
-        ".gn",
-        ".gp",
-        ".gq",
-        ".gr",
-        ".gs",
-        ".gt",
-        ".gu",
-        ".gw",
-        ".gy",
-        ".hk",
-        ".hm",
-        ".hn",
-        ".hr",
-        ".ht",
-        ".hu",
-        ".id",
-        ".ie",
-        ".il",
-        ".im",
-        ".in",
-        ".io",
-        ".iq",
-        ".ir",
-        ".is",
-        ".it",
-        ".je",
-        ".jm",
-        ".jo",
-        ".jp",
-        ".ke",
-        ".kg",
-        ".kh",
-        ".ki",
-        ".km",
-        ".kn",
-        ".kp",
-        ".kr",
-        ".kw",
-        ".ky",
-        ".kz",
-        ".la",
-        ".lb",
-        ".lc",
-        ".li",
-        ".lk",
-        ".lr",
-        ".ls",
-        ".lt",
-        ".lu",
-        ".lv",
-        ".ly",
-        ".ma",
-        ".mc",
-        ".md",
-        ".me",
-        ".mg",
-        ".mh",
-        ".mk",
-        ".ml",
-        ".mm",
-        ".mn",
-        ".mo",
-        ".mp",
-        ".mq",
-        ".mr",
-        ".ms",
-        ".mt",
-        ".mu",
-        ".mv",
-        ".mw",
-        ".mx",
-        ".my",
-        ".mz",
-        ".na",
-        ".nc",
-        ".ne",
-        ".nf",
-        ".ng",
-        ".ni",
-        ".nl",
-        ".no",
-        ".np",
-        ".nr",
-        ".nu",
-        ".nz",
-        ".om",
-        ".pa",
-        ".pe",
-        ".pf",
-        ".pg",
-        ".ph",
-        ".pk",
-        ".pl",
-        ".pm",
-        ".pn",
-        ".pr",
-        ".ps",
-        ".pt",
-        ".pw",
-        ".py",
-        ".qa",
-        ".re",
-        ".ro",
-        ".rs",
-        ".ru",
-        ".rw",
-        ".sa",
-        ".sb",
-        ".sc",
-        ".sd",
-        ".se",
-        ".sg",
-        ".sh",
-        ".si",
-        ".sj",
-        ".sk",
-        ".sl",
-        ".sm",
-        ".sn",
-        ".so",
-        ".sr",
-        ".ss",
-        ".st",
-        ".su",
-        ".sv",
-        ".sx",
-        ".sy",
-        ".sz",
-        ".tc",
-        ".td",
-        ".tf",
-        ".tg",
-        ".th",
-        ".tj",
-        ".tk",
-        ".tl",
-        ".tm",
-        ".tn",
-        ".to",
-        ".tp",
-        ".tr",
-        ".tt",
-        ".tv",
-        ".tw",
-        ".tz",
-        ".ua",
-        ".ug",
-        ".uk",
-        ".us",
-        ".uy",
-        ".uz",
-        ".va",
-        ".vc",
-        ".ve",
-        ".vg",
-        ".vi",
-        ".vn",
-        ".vu",
-        ".wf",
-        ".ws",
-        ".ye",
-        ".yt",
-        ".yu",
-        ".za",
-        ".zm",
-        ".zw"
+
+# get rid of tracking pixels
+def check_tracking_pixel(url):
+
+    known_tracking_pixel_urls = [
+        'pixel.quantserve.com',
     ]
 
-    # split off the filename, if there is one
-    name_to_check = os.path.splitext(file_to_check)[0]
-
-    # if any(name in file_to_check for name in tld_names):
-    if any(name in name_to_check for name in tld_names):
+    if url in known_tracking_pixel_urls:
         return True
     else:
         return False
-
 
 # let's do this
 if __name__ == "__main__":
