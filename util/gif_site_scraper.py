@@ -28,16 +28,13 @@ define("mongo_port", default=27017, help="port mongodb is listening on", type=in
 define("mongo_dbname", default="gif-dot-get", help="name of the database", type=str)
 
 
-# connect to mongo
+# connect to mongodb using mongoengine
 def get_db_connection():
-
-    # connect using mongoengine
     db = connect(
         tornado.options.options.mongo_dbname,
         host=tornado.options.options.mongo_url,
         port=tornado.options.options.mongo_port
     )
-
     return db
 
 
