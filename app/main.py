@@ -4,6 +4,7 @@
 import os.path
 import json
 import random
+import urlparse
 
 # import tornado things
 import tornado.escape
@@ -22,7 +23,7 @@ from models import Gif
 
 # define the app settings
 define("port", default=5000, help="run on the given port", type=int)
-define("base_url", default="http://gif.dory.me", help="name of the database", type=str)
+define("base_url", default="http://gif.dory.me/api/", help="name of the database", type=str)
 define("mongo_url", default="localhost", help="location of mongodb", type=str)
 define("mongo_port", default=27017, help="port mongodb is listening on", type=int)
 define("mongo_dbname", default="gif-dot-get", help="name of the database", type=str)
@@ -112,10 +113,14 @@ class IndexHandler(tornado.web.RequestHandler):
 class RootHandler(tornado.web.RequestHandler):
     def get(self, q=None):
 
-        # if that query produced a result, return it
-        response = {
-            "api_base": tornado.options.options.base_url,
+        # define the API base url
+        api_base = tornado.options.options.base_url
 
+        # describe the current available API endpoints
+        response = {
+            "gif": urlparse.urljoin(api_base, "/gif/"),
+            "gifsite": urlparse.urljoin(api_base, "/gifsite/"),
+            "random": urlparse.urljoin(api_base, "/gif/random"),
         }
 
         # write it out
