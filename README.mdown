@@ -88,6 +88,17 @@ And for funsies, you can see what gif-hosting sites are currently being tracked:
     curl localhost:5000/api/gifsite/
 
 
+#### Redirecting to an image
+
+If you're just looking for one image, and you'd rather receive the iamge instead of the JSON representation of it, that's cool too!
+
+    curl http://localhost:5000/api/gif/random/?redirect=true
+
+That will redirect you to the image returned, as will a single-gif query:
+
+    curl http://localhost:5000/api/gif/zork/?redirect=true
+
+
 #### Scraping
 
 To scrape the great Ethan Marcotte's [bukk.it](http://bukk.it), for example, you could run the following:
