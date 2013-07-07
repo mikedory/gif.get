@@ -21,7 +21,7 @@ from app.models import Gif
 # parse the command-line options
 define("gif_site_url", help="the url of the site to scrape", type=str)
 define("gif_site_name", help="the name of the site being scraped", type=str)
-define("element", default="a", help="the type of tag to search for", type=str)
+define("element", default="img", help="the type of tag to search for", type=str)
 define("tags", default=None, help="tags to apply to everything scraped", type=str)
 define("mongo_url", default="localhost", help="location of mongodb", type=str)
 define("mongo_port", default=27017, help="port mongodb is listening on", type=int)
