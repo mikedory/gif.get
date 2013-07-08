@@ -60,6 +60,7 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
     # grab all the links on the page
     for image in soup.findAll(element):
 
+        # determine how to handle the target in question
         if "a" in element:
             target_url = image["href"]
         elif "img" in element:
@@ -67,6 +68,7 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
         else:
             sys.exit('Only "a" and "img" elements are supported.')
 
+        # check the url, and update the target accordingly
         target_url_segments = url_split(target_url)
         if target_url_segments.netloc:
             # it is an absolute url
@@ -109,7 +111,6 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
 
                 # in which gifs are found or created
                 gif_upsert = update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, gif_tags)
-
                 print gif_upsert
 
                 # split out the http(s) if it exists
@@ -117,10 +118,14 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
                     gif_site_url_segments = url_split(host_name)
                     host_name = gif_site_url_segments.netloc
 
+                # strip off .com and a few other fun things
                 host_name_slug = host_name.strip('cmowz.')
-                gif_site_upsert = update_gif_site_by_slug(host_name, host_name_slug, gif_site_description, gif_site_tags)
 
+                # check or create the gifsite
+                gif_site_upsert = update_gif_site_by_slug(host_name, host_name_slug, gif_site_description, gif_site_tags)
                 print gif_site_upsert
+
+                # space things out
                 print '---\n'
 
     print "done!"
