@@ -55,6 +55,8 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
     gif_tags = tags_split(gif_tags)
     gif_site_tags = tags_split(gif_site_tags)
 
+    print "*** starting to scrape %s ***" % gif_site_url
+
     # grab all the links on the page
     for image in soup.findAll(element):
 
@@ -79,6 +81,7 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
 
         # make sure we're only getting gifs, jpgs, and jpegs
         if any(extension in target_url for extension in ['gif', 'jpg', 'jpeg']):
+
 
             # make sure it's not a tracking pixel
             if not check_tracking_pixel(target_image_base_url):
@@ -120,6 +123,8 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
 
                 print gif_site_upsert
                 print '---\n'
+
+    print "done!"
 
 
 # write in all the newfound gifs
