@@ -82,7 +82,6 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
         # make sure we're only getting gifs, jpgs, and jpegs
         if any(extension in target_url for extension in ['gif', 'jpg', 'jpeg']):
 
-
             # make sure it's not a tracking pixel
             if not check_tracking_pixel(target_image_base_url):
 
