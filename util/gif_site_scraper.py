@@ -3,6 +3,7 @@ import sys
 import os
 import os.path
 import urlparse
+import re
 
 # import our add-ons
 import tornado
@@ -70,7 +71,7 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
         else:
             # it is a relative url
             target_image_base_url = gif_site_url
-            if 'http' not in gif_site_name:
+            if not re.match(r'http(s?)\:', gif_site_name):
                 gif_site_name = 'http://' + gif_site_name
             target_image_url = gif_site_name + '/' + target_url
 
@@ -105,6 +106,11 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
                 gif_upsert = update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, gif_tags)
 
                 print gif_upsert
+
+                # split out the http(s) if it exists
+                if re.match(r'http(s?)\:', host_name):
+                    gif_site_url_segments = url_split(host_name)
+                    host_name = gif_site_url_segments.netloc
 
                 host_name_slug = host_name.strip('cmowz.')
                 gif_site_upsert = update_gif_site_by_slug(host_name, host_name_slug, gif_site_description, gif_site_tags)
