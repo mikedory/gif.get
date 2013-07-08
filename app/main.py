@@ -203,26 +203,31 @@ class RandomGifHandler(tornado.web.RequestHandler):
 class GifsiteHandler(tornado.web.RequestHandler):
     def get(self, slug):
 
+        query_limit = self.get_argument('limit', '25')
+        query_order_by = self.get_argument('sort', '-created_at')
+
         # if there's a gif requested, look it up
         if slug is not None:
             try:
                 gifsite = Gifsite.objects.get(slug=slug)
+                response = format_gifsite_for_json_response(gifsite)
+
             except DoesNotExist:
-                gifsite = None
+                # if that query came up empty, return a 404
+                self.set_status(404)
+                response = format_404_for_json_response()
 
-        # if none were requested, return one at random
+        # if no gifsite was requested, fetch them all
         else:
-            gifsites = Gifsite.objects.all()
-            gifsite = random.choice(gifsites)
+            # get every entry matching the optional type and limit filters
+            gifsites = Gifsite.objects.order_by(query_order_by)[:int(query_limit)]
 
-        # if that produced a result, return it
-        if gifsite is not None:
-            response = format_gifsite_for_json_response(gifsite)
-
-        # if that search came up empty, return a 404
-        else:
-            self.set_status(404)
-            response = format_404_for_json_response()
+            # if that query produced a result, return it
+            response_list = []
+            for gifsite in gifsites:
+                single_response = format_gifsite_for_json_response(gifsite)
+                response_list.append(single_response)
+            response = dict(gifsites=response_list)
 
         # write it out
         self.set_header('Content-Type', 'application/javascript')
