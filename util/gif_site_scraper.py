@@ -1,4 +1,6 @@
 # import stdlib stuff
+debug = False
+
 import sys
 import os
 import os.path
@@ -91,16 +93,17 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
                 gif_tags = gif_tags
 
                 # debugginate
-                print '---'
-                print 'for tag %s of type "%s": ' % (target_url, element)
-                print 'title: %s' % title
-                print 'slug: %s' % slug
-                print 'img_url: %s' % img_url
-                print 'img_type: %s' % img_type
-                print 'host_name: %s' % host_name
-                print 'host_url: %s' % host_url
-                print 'gif_tags: %s' % gif_tags
-                print 'gif_site_tags: %s' % gif_site_tags
+                if debug is True:
+                    print '---'
+                    print 'for tag %s of type "%s": ' % (target_url, element)
+                    print 'title: %s' % title
+                    print 'slug: %s' % slug
+                    print 'img_url: %s' % img_url
+                    print 'img_type: %s' % img_type
+                    print 'host_name: %s' % host_name
+                    print 'host_url: %s' % host_url
+                    print 'gif_tags: %s' % gif_tags
+                    print 'gif_site_tags: %s' % gif_site_tags
 
                 # in which gifs are found or created
                 gif_upsert = update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, gif_tags)
@@ -160,7 +163,6 @@ def url_split(url):
 
 # split the tags (or return an empty list)
 def tags_split(tags_string):
-    print tags_string
     if tags_string is not None:
         tags_list = tags_string.split(',')
     else:
