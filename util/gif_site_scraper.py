@@ -185,6 +185,7 @@ def check_tracking_pixel(url):
 
     known_tracking_pixel_urls = [
         'pixel.quantserve.com',
+        'www.google-analytics.com'
     ]
 
     if url in known_tracking_pixel_urls:
