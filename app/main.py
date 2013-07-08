@@ -77,6 +77,7 @@ def format_gifsite_for_json_response(gifsite):
     single_response = {
         "title": gifsite["title"],
         "slug": gifsite["slug"],
+        "url": gifsite["url"],
         "description": gifsite["description"],
         "tags": gifsite["tags"],
         "created_at": str(gifsite["created_at"])

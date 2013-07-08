@@ -9,6 +9,7 @@ class Gifsite(Document):
     created_at = DateTimeField(default=datetime.datetime.now, required=True)
     title = StringField(max_length=255, required=True)
     slug = StringField(max_length=255, required=True)
+    url = StringField(max_length=255, required=True)
     description = StringField(required=False)
     tags = ListField(StringField(max_length=30), required=False)
     random = FloatField(default=random())
