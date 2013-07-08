@@ -239,7 +239,7 @@ class GifsiteHandler(tornado.web.RequestHandler):
 def main():
     tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(Application())
-    logging.info('Firing up Tornado on port %d' % tornado.options.options.port)
+    logging.info('Firing up Tornado on port %d...' % tornado.options.options.port)
     http_server.listen(tornado.options.options.port)
 
     # start it up
