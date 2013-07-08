@@ -163,7 +163,9 @@ class GifHandler(tornado.web.RequestHandler):
             for gif in gifs:
                 single_response = format_gif_for_json_response(gif)
                 response_list.append(single_response)
-            response = dict(gifs=response_list)
+            response = {
+                "gifs": response_list
+            }
 
         # write it out
         self.set_header('Content-Type', 'application/javascript')
@@ -228,7 +230,9 @@ class GifsiteHandler(tornado.web.RequestHandler):
             for gifsite in gifsites:
                 single_response = format_gifsite_for_json_response(gifsite)
                 response_list.append(single_response)
-            response = dict(gifsites=response_list)
+            response = {
+                "gifsites": response_list
+            }
 
         # write it out
         self.set_header('Content-Type', 'application/javascript')
