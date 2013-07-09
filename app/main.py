@@ -118,11 +118,16 @@ class RootHandler(tornado.web.RequestHandler):
         # define the API base url
         api_base = tornado.options.options.base_url
 
+        # make sure the base has a trailing slash
+        if not api_base.endswith('/'):
+            api_base += '/'
+
         # describe the current available API endpoints
+        # note: these must *not* have a leading slash
         response = {
-            "gif": urlparse.urljoin(api_base, "/gif/"),
-            "gifsite": urlparse.urljoin(api_base, "/gifsite/"),
-            "random": urlparse.urljoin(api_base, "/gif/random"),
+            "gif": urlparse.urljoin(api_base, "gif/"),
+            "gifsite": urlparse.urljoin(api_base, "gifsite/"),
+            "random": urlparse.urljoin(api_base, "gif/random"),
         }
 
         # write it out
