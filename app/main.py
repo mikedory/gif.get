@@ -58,7 +58,7 @@ class Application(tornado.web.Application):
 
 
 # format gifs for json output
-def format_gif_for_json_response(gif):
+def format_gif_for_json_response(gif, href):
     single_response = {
         "title": gif["title"],
         "slug": gif["slug"],
@@ -67,19 +67,21 @@ def format_gif_for_json_response(gif):
         "host_name": gif["host_name"],
         "host_url": gif["host_url"],
         "tags": gif["tags"],
+        "href": href,
         "created_at": str(gif["created_at"])
     }
     return single_response
 
 
 # format gifsites for json output
-def format_gifsite_for_json_response(gifsite):
+def format_gifsite_for_json_response(gifsite, href):
     single_response = {
         "title": gifsite["title"],
         "slug": gifsite["slug"],
         "url": gifsite["url"],
         "description": gifsite["description"],
         "tags": gifsite["tags"],
+        "href": href,
         "created_at": str(gifsite["created_at"])
     }
     return single_response
@@ -92,6 +94,18 @@ def format_404_for_json_response():
         "status": "404",
     }
     return single_response
+
+
+# prettily join urls
+def url_join(url_base, url_to_join):
+
+    # make sure the base has a trailing slash
+    if not url_base.endswith('/'):
+        url_base += '/'
+
+    joined_url = urlparse.urljoin(url_base, url_to_join)
+
+    return joined_url
 
 
 # the main page
@@ -118,16 +132,12 @@ class RootHandler(tornado.web.RequestHandler):
         # define the API base url
         api_base = tornado.options.options.base_url
 
-        # make sure the base has a trailing slash
-        if not api_base.endswith('/'):
-            api_base += '/'
-
         # describe the current available API endpoints
         # note: these must *not* have a leading slash
         response = {
-            "gif": urlparse.urljoin(api_base, "gif/"),
-            "gifsite": urlparse.urljoin(api_base, "gifsite/"),
-            "random": urlparse.urljoin(api_base, "gif/random"),
+            "gif": url_join(api_base, "gif/"),
+            "gifsite": url_join(api_base, "gifsite/"),
+            "random": url_join(api_base, "gif/random"),
         }
 
         # write it out
