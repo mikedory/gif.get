@@ -22,6 +22,10 @@ from mongoengine import *
 from models import Gifsite
 from models import Gif
 
+# import 
+import lib.api as api
+import lib.util as util
+
 # define the app settings
 define("port", default=5000, help="run on the given port", type=int)
 define("base_url", default="http://gif.dory.me/api/", help="name of the database", type=str)
@@ -57,57 +61,6 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers, **settings)
 
 
-# format gifs for json output
-def format_gif_for_json_response(gif):
-    single_response = {
-        "title": gif["title"],
-        "slug": gif["slug"],
-        "img_url": gif["img_url"],
-        "img_type": gif["img_type"],
-        "host_name": gif["host_name"],
-        "host_url": gif["host_url"],
-        "tags": gif["tags"],
-        "href": gif["href"],
-        "created_at": str(gif["created_at"])
-    }
-    return single_response
-
-
-# format gifsites for json output
-def format_gifsite_for_json_response(gifsite):
-    single_response = {
-        "title": gifsite["title"],
-        "slug": gifsite["slug"],
-        "url": gifsite["url"],
-        "description": gifsite["description"],
-        "tags": gifsite["tags"],
-        "href": gifsite["href"],
-        "created_at": str(gifsite["created_at"])
-    }
-    return single_response
-
-
-# format 404s for json output
-def format_404_for_json_response():
-    single_response = {
-        "title": "404'd!",
-        "status": "404",
-    }
-    return single_response
-
-
-# prettily join urls
-def url_join(url_base, url_to_join):
-
-    # make sure the base has a trailing slash
-    if not url_base.endswith('/'):
-        url_base += '/'
-
-    joined_url = urlparse.urljoin(url_base, url_to_join)
-
-    return joined_url
-
-
 # the main page
 class IndexHandler(tornado.web.RequestHandler):
     def get(self, q=None):
@@ -135,9 +88,9 @@ class RootHandler(tornado.web.RequestHandler):
         # describe the current available API endpoints
         # note: these must *not* have a leading slash
         response = {
-            "gif": url_join(api_base, "gif/"),
-            "gifsite": url_join(api_base, "gifsite/"),
-            "random": url_join(api_base, "gif/random"),
+            "gif": util.url_join(api_base, "gif/"),
+            "gifsite": util.url_join(api_base, "gifsite/"),
+            "random": util.url_join(api_base, "gif/random"),
         }
 
         # write it out
@@ -158,7 +111,7 @@ class GifHandler(tornado.web.RequestHandler):
         if slug is not None:
             try:
                 gif = Gif.objects.get(img_type=query_type, slug=slug)
-                response = format_gif_for_json_response(gif)
+                response = api.format_gif_for_json_response(gif)
 
                 # if a redirect was requested, nicely do so
                 if any(value in query_redirect for value in ['True', 'true']):
@@ -167,7 +120,7 @@ class GifHandler(tornado.web.RequestHandler):
             except DoesNotExist:
                 # if that query came up empty, return a 404
                 self.set_status(404)
-                response = format_404_for_json_response()
+                response = api.format_404_for_json_response()
 
         # if no gif was requested, fetch them all
         else:
@@ -177,7 +130,7 @@ class GifHandler(tornado.web.RequestHandler):
             # if that query produced a result, return it
             response_list = []
             for gif in gifs:
-                single_response = format_gif_for_json_response(gif)
+                single_response = api.format_gif_for_json_response(gif)
                 response_list.append(single_response)
             response = {
                 "gifs": response_list
@@ -202,12 +155,12 @@ class RandomGifHandler(tornado.web.RequestHandler):
 
         # if that query produced a result, return it
         if gif is not None:
-            response = format_gif_for_json_response(gif)
+            response = api.format_gif_for_json_response(gif)
 
         # if that query came up empty, return a 404
         else:
             self.set_status(404)
-            response = format_404_for_json_response()
+            response = api.format_404_for_json_response()
 
         # if a redirect was requested, nicely do so
         if any(value in query_redirect for value in ['True', 'true']):
@@ -229,12 +182,12 @@ class GifsiteHandler(tornado.web.RequestHandler):
         if slug is not None:
             try:
                 gifsite = Gifsite.objects.get(slug=slug)
-                response = format_gifsite_for_json_response(gifsite)
+                response = api.format_gifsite_for_json_response(gifsite)
 
             except DoesNotExist:
                 # if that query came up empty, return a 404
                 self.set_status(404)
-                response = format_404_for_json_response()
+                response = api.format_404_for_json_response()
 
         # if no gifsite was requested, fetch them all
         else:
@@ -244,7 +197,7 @@ class GifsiteHandler(tornado.web.RequestHandler):
             # if that query produced a result, return it
             response_list = []
             for gifsite in gifsites:
-                single_response = format_gifsite_for_json_response(gifsite)
+                single_response = api.format_gifsite_for_json_response(gifsite)
                 response_list.append(single_response)
             response = {
                 "gifsites": response_list
