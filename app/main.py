@@ -22,7 +22,7 @@ from mongoengine import *
 from models import Gifsite
 from models import Gif
 
-# import 
+# import our lib files
 import lib.api as api
 import lib.util as util
 
@@ -41,7 +41,9 @@ class Application(tornado.web.Application):
             (r"/", IndexHandler),
             (r"/api/?", RootHandler),
             (r"/api/gif/([^/]+)?", GifHandler),
-            (r"/api/gif/random/?", RandomGifHandler),
+            (r"/api/gif/([^/]+)?/image/?", GifHandler),
+            (r"/api/gif/random/([^/]+)?", RandomGifHandler),
+            (r"/api/gif/random/([^/]+)?/image/?", RandomGifHandler),
             (r"/api/gifsite/([^/]+)?", GifsiteHandler)
         ]
         settings = dict(
@@ -100,7 +102,7 @@ class RootHandler(tornado.web.RequestHandler):
 
 # the base gif endpoint
 class GifHandler(tornado.web.RequestHandler):
-    def get(self, slug):
+    def get(self, slug, q=None):
 
         query_type = self.get_argument('type', 'gif')
         query_limit = self.get_argument('limit', '25')
@@ -114,7 +116,7 @@ class GifHandler(tornado.web.RequestHandler):
                 response = api.format_gif_for_json_response(gif)
 
                 # if a redirect was requested, nicely do so
-                if any(value in query_redirect for value in ['True', 'true']):
+                if any(value in query_redirect for value in ['True', 'true']) or q == 'image':
                     self.redirect(response["img_url"])
 
             except DoesNotExist:
@@ -163,7 +165,7 @@ class RandomGifHandler(tornado.web.RequestHandler):
             response = api.format_404_for_json_response()
 
         # if a redirect was requested, nicely do so
-        if any(value in query_redirect for value in ['True', 'true']):
+        if any(value in query_redirect for value in ['True', 'true']) or q == 'image':
             self.redirect(response["img_url"])
         else:
             # write it out
