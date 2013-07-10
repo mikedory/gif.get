@@ -135,34 +135,34 @@ def get_gifs_by_element(element, gif_site_url, gif_site_name, gif_tags, gif_site
 def update_gif_by_slug(title, slug, img_url, img_type, host_name, host_url, gif_tags):
 
     # fetch the gif if it already exists, create it if it doesn't
-    gif, created = Gif.objects.get_or_create(
-        slug=slug,
-        title=title,
-        img_url=img_url,
-        img_type=img_type,
-        host_name=host_name,
-        host_url=host_url,
-        tags=gif_tags
+    gif = Gif.objects(slug=slug).update_one(
+        set__title=title,
+        set__img_url=img_url,
+        set__img_type=img_type,
+        set__host_name=host_name,
+        set__host_url=host_url,
+        set__tags=gif_tags,
+        upsert=True
     )
 
     # return the gif and the true/false of its creation
-    return gif, created
+    return gif
 
 
 # add the gifsite to the database
 def update_gif_site_by_slug(title, slug, url, gif_site_description, gif_site_tags):
 
     # fetch the gifsite if it already exists, create it if it doesn't
-    gif_site, created = Gifsite.objects.get_or_create(
-        slug=slug,
-        title=title,
-        url=url,
-        description=gif_site_description,
-        tags=gif_site_tags
+    gif_site = Gifsite.objects(slug=slug).update_one(
+        set__title=title,
+        set__url=url,
+        set__description=gif_site_description,
+        set__tags=gif_site_tags,
+        upsert=True
     )
 
     # return the gif and the true/false of its creation
-    return gif_site, created
+    return gif_site
 
 
 # slice the url up into pieces
