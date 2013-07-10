@@ -4,7 +4,6 @@
 import os.path
 import json
 import random
-import urlparse
 import logging
 
 # import tornado things

@@ -4,7 +4,6 @@ debug = False
 import sys
 import os
 import os.path
-import urlparse
 import re
 
 # import our add-ons
