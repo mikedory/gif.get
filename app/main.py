@@ -39,10 +39,9 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/", IndexHandler),
             (r"/api/?", RootHandler),
+            (r"/api/gif/random/([^/]+)?/?", RandomGifHandler),
             (r"/api/gif/([^/]+)?", GifHandler),
-            (r"/api/gif/([^/]+)?/image/?", GifHandler),
-            (r"/api/gif/random/([^/]+)?", RandomGifHandler),
-            (r"/api/gif/random/([^/]+)?/image/?", RandomGifHandler),
+            (r"/api/gif/([^/]+)/([^/]+)?/?", GifHandler),
             (r"/api/gifsite/([^/]+)?", GifsiteHandler)
         ]
         settings = dict(
@@ -103,6 +102,9 @@ class RootHandler(tornado.web.RequestHandler):
 class GifHandler(tornado.web.RequestHandler):
     def get(self, slug, q=None):
 
+        print slug
+        print q
+
         query_type = self.get_argument('type', 'gif')
         query_limit = self.get_argument('limit', '25')
         query_redirect = self.get_argument('redirect', 'False')
@@ -145,6 +147,9 @@ class GifHandler(tornado.web.RequestHandler):
 # the main endpoint
 class RandomGifHandler(tornado.web.RequestHandler):
     def get(self, q=None):
+
+        print q
+        print 'wat'
 
         # parse the filters off the command line
         query_type = self.get_argument('type', 'gif')
