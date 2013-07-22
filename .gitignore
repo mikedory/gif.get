@@ -2,7 +2,6 @@
 bin
 build
 include
-lib
 
 # python stuff
 *.pyc
