@@ -1,7 +1,7 @@
-beautifulsoup4==4.2.1
+beautifulsoup4==4.3.2
 distribute==0.6.34
-mongoengine==0.8.2
-pymongo==2.5.2
-requests==1.2.3
-tornado==3.0.2
+mongoengine==0.8.4
+pymongo==2.6.3
+requests==2.0.1
+tornado==3.1.1
 wsgiref==0.1.2
