@@ -90,7 +90,7 @@ And for funsies, you can see what gif-hosting sites are currently being tracked:
 
 #### Redirecting to an image
 
-If you're just looking for one image, and you'd rather receive the iamge instead of the JSON representation of it, that's cool too!
+If you're just looking for one image, and you'd rather receive the image instead of the JSON representation of it, that's cool too!
 
     curl http://localhost:5000/api/gif/random/?redirect=true
 
