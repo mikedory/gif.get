@@ -79,7 +79,7 @@ You can also filter that list by `type` (type of image), `sort` (what attribute 
 
     curl http://localhost:5000/api/gif/?type=gif&sort=+slug&limit=10
 
-Other options include `/api/gif/random/`, to get a single gif at random (filterable by `type`, defaulting to 'gif'):
+Other options include `/api/gif/random/`, to get a single gif at random (filterable by `type`, defaulting to `gif`):
 
     curl localhost:5000/api/gif/random/?type=jpg
 
